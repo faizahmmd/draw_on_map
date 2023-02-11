@@ -33,6 +33,7 @@ class MapWidget extends StatefulWidget {
 
 class _MapWidgetState extends State<MapWidget> {
   List<LatLng> polylineLatLngList = [];
+  List<LatitudeLongitude> latitudeLongitudeList = [];
   bool startDrawing = false;
   MapController mapController = MapController();
   List<Marker>? markersList;
@@ -61,12 +62,16 @@ class _MapWidgetState extends State<MapWidget> {
             },
             onPointerHover: (pointerHoverEvent, latLng){
               if(startDrawing){
-                widget.drawnRouteLatLngList(polylineLatLngList);
                 setState(() {
                   polylineLatLngList.add
                     (LatLng(latLng.latitude, latLng.longitude))
                   ;
+                  latitudeLongitudeList.add
+                    (LatitudeLongitude(latLng.latitude, latLng.longitude))
+                  ;
                 });
+                widget.drawnRouteLatLngList(latitudeLongitudeList);
+
               }
 
             }
