@@ -33,7 +33,7 @@ class MapWidget extends StatefulWidget {
 
 class _MapWidgetState extends State<MapWidget> {
   List<LatLng> polylineLatLngList = [];
-  List<LatitudeLongitude> latitudeLongitudeList = [];
+  List<Map<String, dynamic>> latitudeLongitudeList = [];
   bool startDrawing = false;
   MapController mapController = MapController();
   List<Marker>? markersList;
@@ -67,7 +67,12 @@ class _MapWidgetState extends State<MapWidget> {
                     (LatLng(latLng.latitude, latLng.longitude))
                   ;
                   latitudeLongitudeList.add
-                    (LatitudeLongitude(latLng.latitude, latLng.longitude))
+                    (
+                      {
+                        "latitude": latLng.latitude,
+                        "longitude": latLng.longitude
+                      }
+                      )
                   ;
                 });
                 widget.drawnRouteLatLngList(latitudeLongitudeList);
