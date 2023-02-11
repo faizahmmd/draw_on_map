@@ -23,10 +23,9 @@ class MapWidget extends StatefulWidget {
   final LatitudeLongitude? center;
   final LatitudeLongitude currentUserLocation;
   final List<MapMarker>? markers;
-  final Positioned? polylineResetWidget, currentLocationFocusWidget;
   final ValueChanged drawnRouteLatLngList;
   final bool isDotted;
-  const MapWidget({Key? key, this.minZoom, this.maxZoom, required this.zoom, this.center, this.markers, required this.polylineResetWidget, required this.drawnRouteLatLngList, required this.strokeWidth, required this.polylineColor, required this.borderStrokeWidth, required this.borderColor, required this.isDotted, this.currentLocationFocusWidget, required this.currentUserLocation}) : super(key: key);
+  const MapWidget({Key? key, this.minZoom, this.maxZoom, required this.zoom, this.center, this.markers, required this.drawnRouteLatLngList, required this.strokeWidth, required this.polylineColor, required this.borderStrokeWidth, required this.borderColor, required this.isDotted, required this.currentUserLocation}) : super(key: key);
 
   @override
   State<MapWidget> createState() => _MapWidgetState();
@@ -48,63 +47,47 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        FlutterMap(
-            mapController: mapController,
-            options: MapOptions(
-                zoom: widget.zoom,
-                minZoom: widget.minZoom,
-                maxZoom: widget.maxZoom,
-                center: LatLng(widget.center?.latitude??0.0, widget.center?.longitude??0.0),
-                onTap: (tapPosition, latLng){
-                  setState(() {
-                    startDrawing = !startDrawing;
-                  });
-                },
-                onPointerHover: (pointerHoverEvent, latLng){
-                  if(startDrawing){
-                    widget.drawnRouteLatLngList(polylineLatLngList);
-                    setState(() {
-                      polylineLatLngList.add
-                        (LatLng(latLng.latitude, latLng.longitude))
-                      ;
-                    });
-                  }
-
-                }
-            ),
-            children: [
-              TileLayer(
-                minZoom: 1,
-                maxZoom: 18,
-                backgroundColor: Colors.white,
-                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                subdomains: const ['a', 'b', 'c'],
-              ),
-              MarkerLayer(markers: markersList??[]),
-              PolylineLayer(polylines: [Polyline(
-                  strokeWidth: widget.strokeWidth,
-                  color: widget.polylineColor,
-                  borderStrokeWidth: widget.borderStrokeWidth,
-                  borderColor: widget.borderColor,
-                  isDotted: widget.isDotted,
-                  points: polylineLatLngList)])
-            ]
-        ),
-        GestureDetector(
-            onTap: (){
+    return FlutterMap(
+        mapController: mapController,
+        options: MapOptions(
+            zoom: widget.zoom,
+            minZoom: widget.minZoom,
+            maxZoom: widget.maxZoom,
+            center: LatLng(widget.center?.latitude??0.0, widget.center?.longitude??0.0),
+            onTap: (tapPosition, latLng){
               setState(() {
-                polylineLatLngList.clear();
+                startDrawing = !startDrawing;
               });
             },
-            child: widget.polylineResetWidget),
-        GestureDetector(
-            onTap: (){
-             mapController.move(LatLng(widget.currentUserLocation.latitude, widget.currentUserLocation.longitude), widget.zoom);
-            },
-            child: widget.currentLocationFocusWidget)
-      ],
+            onPointerHover: (pointerHoverEvent, latLng){
+              if(startDrawing){
+                widget.drawnRouteLatLngList(polylineLatLngList);
+                setState(() {
+                  polylineLatLngList.add
+                    (LatLng(latLng.latitude, latLng.longitude))
+                  ;
+                });
+              }
+
+            }
+        ),
+        children: [
+          TileLayer(
+            minZoom: 1,
+            maxZoom: 18,
+            backgroundColor: Colors.white,
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: const ['a', 'b', 'c'],
+          ),
+          MarkerLayer(markers: markersList??[]),
+          PolylineLayer(polylines: [Polyline(
+              strokeWidth: widget.strokeWidth,
+              color: widget.polylineColor,
+              borderStrokeWidth: widget.borderStrokeWidth,
+              borderColor: widget.borderColor,
+              isDotted: widget.isDotted,
+              points: polylineLatLngList)])
+        ]
     );
   }
 }
