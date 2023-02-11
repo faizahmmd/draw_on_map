@@ -5,3 +5,7 @@
 ## 0.0.2
 
 * Added map controller internally.
+
+## 0.0.3
+
+* bug fixes.

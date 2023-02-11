@@ -3,13 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+
+class LatitudeLongitude{
+  final double latitude, longitude;
+LatitudeLongitude(this.latitude, this.longitude);
+}
+
+class MapMarker{
+  final double height, width;
+  final LatitudeLongitude point;
+  final Widget Function(BuildContext) builder;
+  MapMarker(this.height, this.width, this.point, this.builder);
+}
+
 class MapWidget extends StatefulWidget {
   final double? minZoom, maxZoom;
   final double zoom, strokeWidth, borderStrokeWidth;
   final Color polylineColor, borderColor;
-  final LatLng? center;
-  final LatLng currentUserLocation;
-  final List<Marker>? markers;
+  final LatitudeLongitude? center;
+  final LatitudeLongitude currentUserLocation;
+  final List<MapMarker>? markers;
   final Positioned? polylineResetWidget, currentLocationFocusWidget;
   final ValueChanged drawnRouteLatLngList;
   final bool isDotted;
@@ -23,6 +36,15 @@ class _MapWidgetState extends State<MapWidget> {
   List<LatLng> polylineLatLngList = [];
   bool startDrawing = false;
   MapController mapController = MapController();
+  List<Marker>? markersList;
+
+  @override
+  void initState() {
+    widget.markers?.forEach((element) {
+      markersList?.add(Marker(height: element.height, width: element.width, point: LatLng(element.point.latitude, element.point.longitude), builder: element.builder));
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +56,7 @@ class _MapWidgetState extends State<MapWidget> {
                 zoom: widget.zoom,
                 minZoom: widget.minZoom,
                 maxZoom: widget.maxZoom,
-                center: widget.center,
+                center: LatLng(widget.center?.latitude??0.0, widget.center?.longitude??0.0),
                 onTap: (tapPosition, latLng){
                   setState(() {
                     startDrawing = !startDrawing;
@@ -60,7 +82,7 @@ class _MapWidgetState extends State<MapWidget> {
                 urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: const ['a', 'b', 'c'],
               ),
-              MarkerLayer(markers: widget.markers??[]),
+              MarkerLayer(markers: markersList??[]),
               PolylineLayer(polylines: [Polyline(
                   strokeWidth: widget.strokeWidth,
                   color: widget.polylineColor,
@@ -79,7 +101,7 @@ class _MapWidgetState extends State<MapWidget> {
             child: widget.polylineResetWidget),
         GestureDetector(
             onTap: (){
-             mapController.move(widget.currentUserLocation, widget.zoom);
+             mapController.move(LatLng(widget.currentUserLocation.latitude, widget.currentUserLocation.longitude), widget.zoom);
             },
             child: widget.currentLocationFocusWidget)
       ],
